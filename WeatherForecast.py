@@ -597,6 +597,10 @@ def main():
     logger = setup_logging(config)
     
     st.title("🌤️ Weather Forecasting System")
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9638bf6b8f77322ee84d219b1652c538af349890
     with st.sidebar:
         st.header("⚙️ Configuration")
         
