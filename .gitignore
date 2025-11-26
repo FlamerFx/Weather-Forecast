@@ -4,9 +4,6 @@ venv/
 __pycache__/
 *.pyc
 
-# Streamlit
-streamlit_env/
-
 # Logs & model artifacts
 logs/
 models/
