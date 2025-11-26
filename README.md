@@ -1,4 +1,4 @@
-# 🌤️ Weather Forecast — Machine Learning Temperature Prediction
+# 🌤️ Weather Forecast
 
 A machine-learning powered weather prediction system built with Python, scikit-learn, and Streamlit. The model learns from historical weather data (multi-city, India-focused) and predicts temperature in real-time using live data from the OpenWeatherMap API.
 
