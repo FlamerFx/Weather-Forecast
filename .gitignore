@@ -1,0 +1,12 @@
+# Virtual environment
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Streamlit
+streamlit_env/
+
+# Logs & model artifacts
+logs/
+models/
