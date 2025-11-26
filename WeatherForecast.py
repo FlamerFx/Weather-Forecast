@@ -1,9 +1,3 @@
-"""
-Weather Forecasting System
-===========================================
-A robust ML-based weather prediction system with comprehensive logging,
-monitoring, and research capabilities.
-"""
 from dotenv import load_dotenv
 import os
 
@@ -32,10 +26,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
-# ============================================================================
-# CONFIGURATION ⚙️
-# ============================================================================
-
+# CONFIGURATION
 
 @dataclass
 class Config:
@@ -45,13 +36,11 @@ class Config:
     METRICS_PATH: Path = Path("models/metrics.json")
     LOG_PATH: Path = Path("logs/weather_forecast.log")
     
-    # Model parameters
     N_ESTIMATORS: int = 300
     RANDOM_STATE: int = 42
     TEST_SIZE: float = 0.2
     CV_FOLDS: int = 5
     
-    # API settings
     API_TIMEOUT: int = 10
     MAX_RETRIES: int = 3
     
@@ -60,10 +49,7 @@ class Config:
         self.MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
         self.LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-
-# ============================================================================
-# LOGGING SETUP 📝
-# ============================================================================
+# LOGGING SETUP
 
 def setup_logging(config: Config) -> logging.Logger:
     """Configure comprehensive file and console logging."""
@@ -91,11 +77,6 @@ def setup_logging(config: Config) -> logging.Logger:
     logger.addHandler(ch)
     
     return logger
-
-
-# ============================================================================
-# DECORATORS ✨
-# ============================================================================
 
 def retry_on_failure(max_retries: int = 3, delay: float = 1.0):
     """
@@ -130,11 +111,7 @@ def log_execution_time(logger: logging.Logger):
         return wrapper
     return decorator
 
-
-# ============================================================================
-# DATA VALIDATION ✅
-# ============================================================================
-
+# DATA VALIDATION
 class DataValidator:
     """Methods for validating input data and API responses."""
     
@@ -169,10 +146,7 @@ class DataValidator:
         required = ["humidity", "pressure", "wind_speed", "year", "month", "day"]
         return all(key in features for key in required)
 
-
-# ============================================================================
-# WEATHER API CLIENT 📡
-# ============================================================================
+# WEATHER API CLIENT
 
 class WeatherAPIClient:
     """Robust weather API client with error handling and retry logic."""
@@ -257,10 +231,7 @@ class WeatherAPIClient:
         return features
 
 
-
-# ============================================================================
-# MODEL TRAINING AND EVALUATION 🧠
-# ============================================================================
+# MODEL TRAINING AND EVALUATION
 
 def fix_dataset(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -272,27 +243,21 @@ def fix_dataset(df: pd.DataFrame) -> pd.DataFrame:
       - ensuring no missing values
     """
 
-    # 1. Parse date column
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
-    # 2. Drop rows with invalid dates (if any)
     df = df.dropna(subset=["date"]).reset_index(drop=True)
 
-    # 3. Sort by date (very important)
     df = df.sort_values("date")
 
-    # 4. Add time-based features
     df["year"] = df["date"].dt.year
     df["month"] = df["date"].dt.month
     df["day"] = df["date"].dt.day
     df["day_of_year"] = df["date"].dt.dayofyear
     df["quarter"] = df["date"].dt.quarter
 
-    # 5. Cyclical encoding (fix for seasonal patterns)
     df["month_sin"] = np.sin(2 * np.pi * df["month"] / 12)
     df["month_cos"] = np.cos(2 * np.pi * df["month"] / 12)
 
-    # 6. Interaction feature
     df["humidity_pressure"] = (df["humidity"] * df["pressure"]) / 100000
 
     return df
@@ -348,10 +313,8 @@ class WeatherModelTrainer:
             self.logger.error(f"Data file not found: {self.config.CSV_PATH}")
             raise
         
-        # Remove rows missing target
         df = df.dropna(subset=["temperature"])
 
-        # 🔥 FIX DATASET
         df = fix_dataset(df)
 
         self.logger.info("Dataset fixed successfully")
@@ -412,19 +375,16 @@ class WeatherModelTrainer:
     ) -> Dict[str, float]:
         """Comprehensive model evaluation on train, test, and cross-validation sets."""
         
-        # Training metrics
         train_preds = self.model.predict(X_train)
         train_mae = mean_absolute_error(y_train, train_preds)
         train_rmse = np.sqrt(mean_squared_error(y_train, train_preds))
         train_r2 = r2_score(y_train, train_preds)
-        
-        # Test metrics
+    
         test_preds = self.model.predict(X_test)
         test_mae = mean_absolute_error(y_test, test_preds)
         test_rmse = np.sqrt(mean_squared_error(y_test, test_preds))
         test_r2 = r2_score(y_test, test_preds)
         
-        # Cross-validation for robust performance check
         cv_scores = cross_val_score(
             self.model,
             X_train,
@@ -472,10 +432,7 @@ class WeatherModelTrainer:
             json.dump(self.metrics, f, indent=2)
         self.logger.info(f"Metrics saved to {self.config.METRICS_PATH}")
 
-
-# ============================================================================
-# MODEL INFERENCE 🔮
-# ============================================================================
+# MODEL INFERENCE
 
 class WeatherPredictor:
     """Handles model loading and making predictions."""
@@ -516,7 +473,6 @@ class WeatherPredictor:
         
         df = pd.DataFrame([features])
         
-        # Align columns with training data to ensure correct feature order/presence
         df = df.reindex(columns=self.feature_columns, fill_value=0)
         
         prediction = self.model.predict(df)[0]
@@ -524,10 +480,7 @@ class WeatherPredictor:
         self.logger.info(f"Prediction: {prediction:.2f}°C")
         return prediction
 
-
-# ============================================================================
-# STREAMLIT APPLICATION 🖥️
-# ============================================================================
+# STREAMLIT
 
 def display_metrics(metrics: Dict):
     """Display model metrics in Streamlit."""
@@ -574,7 +527,6 @@ def display_prediction_results(
         st.metric("Actual Temperature", f"{actual_temp:.2f}°C")
     
     with col3:
-        # Simple heuristic for a fun 'accuracy' metric
         accuracy = max(0, 100 - abs(error) * 2)
         st.metric("Prediction Accuracy", f"{accuracy:.1f}%")
     
