@@ -549,11 +549,7 @@ def main():
     logger = setup_logging(config)
     
     st.title("🌤️ Weather Forecasting System")
-    st.markdown("""
-    Advanced ML-based weather prediction with comprehensive logging and monitoring.
-    Ideal for academic and research applications.
-    """)
-    
+
     with st.sidebar:
         st.header("⚙️ Configuration")
         
